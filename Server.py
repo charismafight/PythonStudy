@@ -15,6 +15,7 @@ s.listen(3)
 # return a socket and address info
 sObj, address = s.accept()
 #max buffersize bytes
+#recv func will stay still a socket request come
 request =sObj.recv(1024)
 
 print('request is :',request)
