@@ -49,4 +49,13 @@ while True:
         print("connected by:", ip)
         print("request is:", request)
         sObj.sendall(content)
+
+    #add support for post request
+    if method == "POST":
+        form = request.split('\r\n')
+        idx = form.index('')
+        entry = form[idx:]
+
+        value = entry[-1].split('=')[-1]
+        sObj.sendall(text_content + '\n <p>' + value + '</p>')
     sObj.close()
