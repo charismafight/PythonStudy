@@ -1,5 +1,6 @@
 import unittest
-import Factorial as fa
+
+from UnitTest import Factorial as fa
 
 
 class FactorialTest(unittest.TestCase):
