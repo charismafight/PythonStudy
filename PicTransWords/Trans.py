@@ -23,16 +23,18 @@ def get_char(r, g, b, alfpha=256):
     return ascii_char[int(gray // unit)]
 
 
+w, h = 80, 80
+
 if __name__ == '__main__':
     p = sys.path[0]
     # open and reseize img then read all pixels use a symbol instead
-    pic = Image.open(p + '/PicTransWords/Pics/ascii_dora.png')
-    pic = pic.resize((80, 80), Image.NEAREST)
+    pic = Image.open(p + '/Pics/ascii_dora.png')
+    pic = pic.resize((w, h), Image.NEAREST)
 
     txt = ""
 
-    for i in range(80):
-        for j in range(80):
+    for i in range(h):
+        for j in range(w):
             txt += get_char(*pic.getpixel((j, i)))
 
         txt += '\n'
