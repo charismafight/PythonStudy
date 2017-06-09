@@ -1,7 +1,5 @@
 # image package has func like 'open' so we rename it
 import PIL.Image as Image
-import argparse
-import os
 import sys
 
 # symbol list,choose different to show pic
