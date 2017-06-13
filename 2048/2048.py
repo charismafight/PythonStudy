@@ -1,18 +1,6 @@
 import random as r
 import msvcrt
 
-
-# decorate of command validate,do validate first then call specified func
-def validate(func):
-    def validate_input(c):
-        if str.upper(c) in commands:
-            func(c)
-        else:
-            print('invalid input:' + c)
-
-    return validate_input
-
-
 # another decorate of act in actions
 # actions is ge key='Q' value=func in actions dict
 actions = {}
@@ -27,20 +15,34 @@ def command(command_key):
     return switch_func
 
 
+# decorate of command validate,do validate first then call specified func
+# this decorate should be put behind 'command' because it must be invoke after actions has filled
+def validate(func):
+    def validate_input(c):
+        if str.upper(c) in actions:
+            func(c)
+        else:
+            print('invalid input:' + c)
+
+    return validate_input
+
+
+# command invoker
+@validate
 def do_command(k):
     f = actions[k]
-    f(k)
+    f()
 
 
-@validate
 @command('Q')
-def quit_game(v_code):
+def quit_game():
+    print('see u next time!')
     exit(0)
 
 
-@validate
 @command('R')
-def restart_game(v_code):
+def restart_game():
+    print('restart！')
     return
 
 
@@ -49,10 +51,10 @@ firstNum = r.randrange(2, 5, 2)
 score = firstNum
 print('Score:' + str(score))
 # checkerboard
+print()
 
 # description
-print('(↑) up  (↓) down  (←) left  (→) right  (R) reset  (Q) exit')
-commands = ['R', 'Q']
+print('(W) up  (S) down  (A) left  (D) right  (R) reset  (Q) exit')
 
 while True:
     code = msvcrt.getch().decode()
