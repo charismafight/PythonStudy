@@ -1,9 +1,17 @@
-import random as r
+import random
 import msvcrt
 
 # another decorate of act in actions
 # actions is ge key='Q' value=func in actions dict
 actions = {}
+
+# score
+default_score = random.randrange(2, 5, 2)
+# random row and col to select a position
+row = random.randrange(0, 3)
+col = random.randrange(0, 3)
+game_data = [[0 for x in range(4)] for r in range(4)]
+game_data[row][col] = default_score
 
 
 def command(command_key):
@@ -27,6 +35,24 @@ def validate(func):
     return validate_input
 
 
+# a decorate to generate a num into some blank
+def generator(func):
+    def wrapper():
+        func()
+        if True in [0 in x for x in range(game_data)]:
+            while True:
+                num = random.randrange(2, 5, 2)
+                r_row = random.randrange(0, 3)
+                r_col = random.randrange(0, 3)
+                if game_data[r_row][r_col] == 0:
+                    game_data[r_row][r_col] = num
+                    break
+        else:
+            # game over
+            print('game over')
+            exit(0)
+
+
 # command invoker
 @validate
 def do_command(k):
@@ -43,18 +69,80 @@ def quit_game():
 @command('R')
 def restart_game():
     print('restart！')
+    default_score = random.randrange(2, 5, 2)
+    game_data = [[0 for x in range(4)] for r in range(4)]
+    row = random.randrange(0, 3)
+    col = random.randrange(0, 3)
+    game_data[row][col] = default_score
     return
 
 
-# score
-firstNum = r.randrange(2, 5, 2)
-score = firstNum
-print('Score:' + str(score))
-# checkerboard
-print()
+@command('A')
+def left():
+    for x in range(4):
+        # maybe need a recursion func
+        game_row_left_handler(game_data[x])
+    return
 
-# description
-print('(W) up  (S) down  (A) left  (D) right  (R) reset  (Q) exit')
+
+@command('D')
+def right():
+    for x in range(-4, -1):
+        game_row_right_handler(game_data[x])
+
+
+@generator
+def game_row_left_handler(row):
+    for i in range(row - 1):
+        if i == 1:
+            continue
+        # if left num is 0 then move
+        if row[i - 1] == 0:
+            row[i - 1], row[i] = row[i], row[i - 1]
+            continue
+        if row[i - 1] != row[i]:
+            continue
+
+        if row[i] == row[i - 1]:
+            row[i - 1], row[i] = row[i] * 2, 0
+
+
+@generator
+def game_row_right_handler(row):
+    for i in range(-row):
+        if i == 1:
+            continue
+        # if left num is 0 then move
+        if row[i] == 0:
+            row[i], row[i + 1] = row[i + 1], row[i]
+            continue
+        if row[i] != row[i + 1]:
+            continue
+
+        if row[i] == row[i + 1]:
+            row[i], row[i + 1] = row[i + 1] * 2, 0
+
+
+# give default score to a random 0 position
+
+def update_screen():
+    score = default_score
+    print('Score:' + str(score))
+    # checkerboard
+    sides = '+-----------------------+'
+    blanks = '|{0}|{1}|{2}|{3}|'
+
+    # loop array to fill blanks
+    print(sides)
+    for i in range(4):
+        print(blanks.format(*[str(o).rjust(5).replace('    0', '     ') for o in game_data[i]]))
+        print(sides)
+    # description
+    print('(W) up  (S) down  (A) left  (D) right  (R) reset  (Q) exit')
+
+
+# ini update
+update_screen()
 
 while True:
     code = msvcrt.getch().decode()
