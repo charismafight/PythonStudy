@@ -39,7 +39,7 @@ def validate(func):
 def generator(func):
     def wrapper():
         func()
-        if True in [0 in x for x in range(game_data)]:
+        if True in [0 in x for x in game_data]:
             while True:
                 num = random.randrange(2, 5, 2)
                 r_row = random.randrange(0, 3)
@@ -51,6 +51,8 @@ def generator(func):
             # game over
             print('game over')
             exit(0)
+
+    return wrapper
 
 
 # command invoker
@@ -78,8 +80,9 @@ def restart_game():
 
 
 @command('A')
+@generator
 def left():
-    for x in range(4):
+    for x in range(len(game_data)):
         # maybe need a recursion func
         game_row_left_handler(game_data[x])
     return
@@ -91,25 +94,34 @@ def right():
         game_row_right_handler(game_data[x])
 
 
-@generator
+
 def game_row_left_handler(row):
-    for i in range(row - 1):
-        if i == 1:
+    for i in range(len(row) - 1):
+        if i == 0:
             continue
-        # if left num is 0 then move
+        # if left num is 0 then move until i-n = 0
         if row[i - 1] == 0:
-            row[i - 1], row[i] = row[i], row[i - 1]
+            move_left(row, i)
             continue
         if row[i - 1] != row[i]:
             continue
 
         if row[i] == row[i - 1]:
             row[i - 1], row[i] = row[i] * 2, 0
+    #print(game_data)
+
+
+def move_left(row, i):
+    if i == 0 or row[i] == 0:
+        return
+    if row[i - 1] == 0:
+        row[i], row[i - 1] = 0, row[i]
+        move_left(row, i - 1)
 
 
 @generator
 def game_row_right_handler(row):
-    for i in range(-row):
+    for i in range(-len(row)):
         if i == 1:
             continue
         # if left num is 0 then move
@@ -144,7 +156,9 @@ def update_screen():
 # ini update
 update_screen()
 
-while True:
-    code = msvcrt.getch().decode()
+#while True:
+    # code = msvcrt.getch().decode()
     # deal with input
-    do_command(str.upper(code))
+code = 'A'
+do_command(str.upper(code))
+update_screen()
