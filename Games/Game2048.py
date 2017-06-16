@@ -1,4 +1,5 @@
 import random
+import os
 import msvcrt
 
 # another decorate of act in actions
@@ -10,8 +11,9 @@ default_score = random.randrange(2, 5, 2)
 # random row and col to select a position
 row = random.randrange(0, 3)
 col = random.randrange(0, 3)
-game_data = [[0 for x in range(4)] for r in range(4)]
-game_data[row][col] = default_score
+# game_data = [[0 for x in range(4)] for r in range(4)]
+# game_data[row][col] = default_score
+game_data = [[4, 0, 4, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
 
 
 def command(command_key):
@@ -94,29 +96,35 @@ def right():
         game_row_right_handler(game_data[x])
 
 
-
 def game_row_left_handler(row):
     for i in range(len(row) - 1):
+        pos = i
         if i == 0:
             continue
         # if left num is 0 then move until i-n = 0
         if row[i - 1] == 0:
-            move_left(row, i)
-            continue
+            pos = move_left(row, i)
+
+        # combine when moved
+        if row[pos] == row[pos - 1]:
+            row[pos - 1], row[pos] = row[pos] * 2, 0
+            # print(game_data)
+
         if row[i - 1] != row[i]:
             continue
 
-        if row[i] == row[i - 1]:
-            row[i - 1], row[i] = row[i] * 2, 0
-    #print(game_data)
-
 
 def move_left(row, i):
+    # record the pos of i,it may be changed when move
+    pos = i
     if i == 0 or row[i] == 0:
-        return
+        return pos
+    # if the num before it is 0 then change them each other
     if row[i - 1] == 0:
         row[i], row[i - 1] = 0, row[i]
-        move_left(row, i - 1)
+        pos = move_left(row, i - 1)
+
+    return pos
 
 
 @generator
@@ -138,6 +146,7 @@ def game_row_right_handler(row):
 # give default score to a random 0 position
 
 def update_screen():
+    os.system('cls')
     score = default_score
     print('Score:' + str(score))
     # checkerboard
@@ -156,9 +165,12 @@ def update_screen():
 # ini update
 update_screen()
 
-#while True:
-    # code = msvcrt.getch().decode()
-    # deal with input
-code = 'A'
-do_command(str.upper(code))
+# while True:
+#     code = msvcrt.getch().decode()
+#     # deal with input
+#     do_command(str.upper(code))
+#     update_screen()
+
+# test
+do_command('A')
 update_screen()
