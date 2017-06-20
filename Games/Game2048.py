@@ -13,7 +13,7 @@ row = random.randrange(0, 3)
 col = random.randrange(0, 3)
 # game_data = [[0 for x in range(4)] for r in range(4)]
 # game_data[row][col] = default_score
-game_data = [[4, 0, 4, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+game_data = [[2, 4, 0, 0], [0, 2, 0, 0], [0, 4, 0, 0], [0, 8, 0, 0]]
 
 
 def command(command_key):
@@ -82,22 +82,16 @@ def restart_game():
 
 
 @command('A')
-@generator
+#@generator
 def left():
     for x in range(len(game_data)):
         # maybe need a recursion func
-        game_row_left_handler(game_data[x])
+        game_row_handler(game_data[x])
     return
 
 
-@command('D')
-def right():
-    for x in range(-4, -1):
-        game_row_right_handler(game_data[x])
-
-
-def game_row_left_handler(row):
-    for i in range(len(row) - 1):
+def game_row_handler(row):
+    for i in range(len(row)):
         pos = i
         if i == 0:
             continue
@@ -108,7 +102,6 @@ def game_row_left_handler(row):
         # combine when moved
         if row[pos] == row[pos - 1]:
             row[pos - 1], row[pos] = row[pos] * 2, 0
-            # print(game_data)
 
         if row[i - 1] != row[i]:
             continue
@@ -119,7 +112,7 @@ def move_left(row, i):
     pos = i
     if i == 0 or row[i] == 0:
         return pos
-    # if the num before it is 0 then change them each other
+    # if the num before it is 0 then change their position
     if row[i - 1] == 0:
         row[i], row[i - 1] = 0, row[i]
         pos = move_left(row, i - 1)
@@ -127,20 +120,12 @@ def move_left(row, i):
     return pos
 
 
-@generator
-def game_row_right_handler(row):
-    for i in range(-len(row)):
-        if i == 1:
-            continue
-        # if left num is 0 then move
-        if row[i] == 0:
-            row[i], row[i + 1] = row[i + 1], row[i]
-            continue
-        if row[i] != row[i + 1]:
-            continue
-
-        if row[i] == row[i + 1]:
-            row[i], row[i + 1] = row[i + 1] * 2, 0
+@command('D')
+def right():
+    for x in range(len(game_data)):
+        game_data[x].reverse()
+        game_row_handler(game_data[x])
+        game_data[x].reverse()
 
 
 # give default score to a random 0 position
@@ -172,5 +157,5 @@ update_screen()
 #     update_screen()
 
 # test
-do_command('A')
+do_command('D')
 update_screen()
