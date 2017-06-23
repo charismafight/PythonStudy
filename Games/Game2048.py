@@ -9,11 +9,11 @@ actions = {}
 # score
 default_score = random.randrange(2, 5, 2)
 # random row and col to select a position
-row = random.randrange(0, 3)
-col = random.randrange(0, 3)
-# game_data = [[0 for x in range(4)] for r in range(4)]
-# game_data[row][col] = default_score
-game_data = [[2, 4, 0, 0], [0, 2, 0, 0], [0, 4, 0, 0], [0, 8, 0, 0]]
+game_data = [[0 for x in range(4)] for r in range(4)]
+game_data[random.randrange(0, 3)][random.randrange(0, 3)] = default_score
+
+
+# game_data = [[0, 4, 0, 0], [0, 4, 0, 0], [2, 4, 0, 0], [0, 8, 0, 0]]
 
 
 def command(command_key):
@@ -41,20 +41,27 @@ def validate(func):
 def generator(func):
     def wrapper():
         func()
-        if True in [0 in x for x in game_data]:
-            while True:
-                num = random.randrange(2, 5, 2)
-                r_row = random.randrange(0, 3)
-                r_col = random.randrange(0, 3)
-                if game_data[r_row][r_col] == 0:
-                    game_data[r_row][r_col] = num
-                    break
+        if contain_zero(game_data):
+            # find all 0 pos
+            for i, r in enumerate(game_data):
+                for j, col in enumerate(r):
+                    if col == 0:
+                        game_data[i][j] = random.randrange(2, 5, 2)
+                        return
         else:
             # game over
             print('game over')
             exit(0)
 
     return wrapper
+
+
+def contain_zero(table):
+    for x in table:
+        for y in x:
+            if y == 0:
+                return True
+    return False
 
 
 # command invoker
@@ -72,22 +79,51 @@ def quit_game():
 
 @command('R')
 def restart_game():
+    global game_data
     print('restart！')
-    default_score = random.randrange(2, 5, 2)
     game_data = [[0 for x in range(4)] for r in range(4)]
-    row = random.randrange(0, 3)
-    col = random.randrange(0, 3)
-    game_data[row][col] = default_score
-    return
+    game_data[random.randrange(0, 3)][random.randrange(0, 3)] = random.randrange(2, 5, 2)
+    update_screen()
 
 
 @command('A')
-#@generator
+@generator
+# @generator
 def left():
     for x in range(len(game_data)):
         # maybe need a recursion func
         game_row_handler(game_data[x])
     return
+
+
+@command('D')
+@generator
+def right():
+    for x in range(len(game_data)):
+        game_data[x].reverse()
+        game_row_handler(game_data[x])
+        game_data[x].reverse()
+
+
+@command('W')
+@generator
+def up():
+    global game_data
+    result = list(map(game_row_handler, list(map(list, zip(*game_data)))))
+    # row trans col
+    game_data = list(map(list, zip(*result)))
+
+
+@command('S')
+@generator
+def down():
+    global game_data
+    game_data_afterzip = list(map(list, zip(*game_data)))
+    for r in game_data_afterzip: r.reverse()
+    list(map(game_row_handler, game_data_afterzip))
+    # row trans col
+    for r in game_data_afterzip: r.reverse()
+    game_data = list(map(list, zip(*game_data_afterzip)))
 
 
 def game_row_handler(row):
@@ -105,6 +141,7 @@ def game_row_handler(row):
 
         if row[i - 1] != row[i]:
             continue
+    return row
 
 
 def move_left(row, i):
@@ -120,19 +157,10 @@ def move_left(row, i):
     return pos
 
 
-@command('D')
-def right():
-    for x in range(len(game_data)):
-        game_data[x].reverse()
-        game_row_handler(game_data[x])
-        game_data[x].reverse()
-
-
 # give default score to a random 0 position
-
 def update_screen():
-    os.system('cls')
-    score = default_score
+    clear_screen()
+    score = max(map(max, *game_data))
     print('Score:' + str(score))
     # checkerboard
     sides = '+-----------------------+'
@@ -147,15 +175,20 @@ def update_screen():
     print('(W) up  (S) down  (A) left  (D) right  (R) reset  (Q) exit')
 
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 # ini update
 update_screen()
 
-# while True:
-#     code = msvcrt.getch().decode()
-#     # deal with input
-#     do_command(str.upper(code))
-#     update_screen()
+while True:
+    code = msvcrt.getch().decode()
+    # deal with input
+    do_command(str.upper(code))
+    update_screen()
 
-# test
-do_command('D')
-update_screen()
+# # test
+# do_command('W')
+# do_command('A')
+# update_screen()

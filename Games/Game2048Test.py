@@ -3,9 +3,13 @@ import unittest
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
-        myrow = [0, 0, 2, 0]
+        myrow = [0, 0, 4, 0]
+        print(max(myrow))
+        mytable = [[myrow] * 3]
         self.move_left(myrow, 2)
-        self.assertEqual(myrow, [2, 0, 0, 0])
+        self.assertEqual(myrow, [4, 0, 0, 0])
+        a = max(map(max, *mytable))
+        self.assertEqual(a, 4)
         return
 
     def move_left(self, row, i):
